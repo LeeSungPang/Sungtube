@@ -7,6 +7,13 @@ const currentTime = document.getElementById("currentTime");
 const totalTime = document.getElementById("totalTime");
 const volumeRange = document.getElementById("jsVolume");
 
+const registerView = () => {
+  const videoId = window.location.href.split("/videos/")[1];
+  fetch(`/api/${videoId}/view`, {
+    method: "POST"
+  });
+};
+
 function handlePlayClick() {
   if (videoPlayer.paused) {
     videoPlayer.play();
@@ -27,7 +34,6 @@ function handleVolumeClick() {
     volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
   }
 }
-
 function exitFullScreen() {
   fullScrnBtn.innerHTML = '<i class="fas fa-expand"></i>';
   fullScrnBtn.addEventListener("click", goFullScreen);
@@ -41,7 +47,6 @@ function exitFullScreen() {
     document.msExitFullscreen();
   }
 }
-
 function goFullScreen() {
   if (videoContainer.requestFullscreen) {
     videoContainer.requestFullscreen();
@@ -56,13 +61,11 @@ function goFullScreen() {
   fullScrnBtn.removeEventListener("click", goFullScreen);
   fullScrnBtn.addEventListener("click", exitFullScreen);
 }
-
 const formatDate = seconds => {
   const secondsNumber = parseInt(seconds, 10);
   let hours = Math.floor(secondsNumber / 3600);
   let minutes = Math.floor((secondsNumber - hours * 3600) / 60);
   let totalSeconds = secondsNumber - hours * 3600 - minutes * 60;
-
   if (hours < 10) {
     hours = `0${hours}`;
   }
@@ -74,21 +77,20 @@ const formatDate = seconds => {
   }
   return `${hours}:${minutes}:${totalSeconds}`;
 };
-
 function getCurrentTime() {
   currentTime.innerHTML = formatDate(Math.floor(videoPlayer.currentTime));
 }
-
 function setTotalTime() {
   const totalTimeString = formatDate(videoPlayer.duration);
   totalTime.innerHTML = totalTimeString;
   setInterval(getCurrentTime, 1000);
 }
+
 function handleEnded() {
+  registerView();
   videoPlayer.currentTime = 0;
   playBtn.innerHTML = '<i class="fas fa-play"></i>';
 }
-
 function handleDrag(event) {
   const {
     target: { value }
@@ -102,7 +104,6 @@ function handleDrag(event) {
     volumeBtn.innerHTML = '<i class="fas fa-volume-off"></i>';
   }
 }
-
 function init() {
   videoPlayer.volume = 0.5;
   playBtn.addEventListener("click", handlePlayClick);
@@ -112,7 +113,6 @@ function init() {
   videoPlayer.addEventListener("ended", handleEnded);
   volumeRange.addEventListener("input", handleDrag);
 }
-
 if (videoContainer) {
   init();
 }
